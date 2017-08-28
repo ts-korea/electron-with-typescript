@@ -1,0 +1,27 @@
+{
+  "name": "electron-with-typescript",
+  "version": "1.0.0",
+  "description": "텍스트 기반 온라인 메세지 앱 만들기",
+  "main": "output/index.js",
+  "scripts": {
+    "start": "electron .",
+    "transpile": "tsc",
+    "transpile:watch": "tsc --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ts-korea/electron-with-typescript.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ts-korea/electron-with-typescript/issues"
+  },
+  "homepage": "https://github.com/ts-korea/electron-with-typescript#readme",
+  "devDependencies": {
+    "electron": "^1.7.5",
+    "tslint": "^5.7.0",
+    "typescript": "^2.4.2"
+  }
+}

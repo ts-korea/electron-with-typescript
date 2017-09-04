@@ -2,7 +2,7 @@
   "name": "electron-with-typescript",
   "version": "1.0.0",
   "description": "텍스트 기반 온라인 메세지 앱 만들기",
-  "main": "output/index.js",
+  "main": "output/browser/index.js",
   "scripts": {
     "start": "electron .",
     "transpile": "tsc",

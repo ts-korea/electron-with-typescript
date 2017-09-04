@@ -1,16 +1,15 @@
 import {app} from 'electron';
 import * as firebase from 'firebase';
 
-const firebaseApp = firebase.initializeApp({
+firebase.initializeApp({
     apiKey: 'AIzaSyDCkophSrnmYtoANl583iyMbS_TM4oHBOM',
-    authDomain: 'electron-with-typescript.firebaseapp.com',
     databaseURL: 'https://electron-with-typescript.firebaseio.com',
     projectId: 'electron-with-typescript',
-    storageBucket: 'electron-with-typescript.appspot.com',
-    messagingSenderId: '231390164302'
 });
 
 const auth = firebase.auth();
+const database = firebase.database();
+
 auth.onAuthStateChanged((user: { email: string; }) => {
     console.log(user);
 });

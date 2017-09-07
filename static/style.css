@@ -1,0 +1,26 @@
+.nav-left a {
+    cursor: default;
+}
+
+#login-section {
+    display: block;
+    /*display: none;*/
+}
+
+#chat-section {
+    display: none;
+    /*display: block;*/
+    height: 390px;
+    overflow-y: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+#write-section {
+    display: none;
+    /*display: block;*/
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+    left: 0px;
+}

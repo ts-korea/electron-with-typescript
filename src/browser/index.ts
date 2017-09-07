@@ -27,8 +27,16 @@ auth.onAuthStateChanged((user: { email: string; }) => {
 app.on('ready', () => {
     console.log('app ready');
 
-    const win = new BrowserWindow();
+    const win = new BrowserWindow({
+        width: 500,
+        minWidth: 500,
+        maxWidth: 900,
+        height: 700,
+        minHeight: 700,
+        maxHeight: 700,
+        maximizable: false
+    });
     win.loadURL(html);
 
-    auth.signInWithEmailAndPassword('2woongjae@gmail.com', '2woongjae');
+    // auth.signInWithEmailAndPassword('2woongjae@gmail.com', '2woongjae');
 });

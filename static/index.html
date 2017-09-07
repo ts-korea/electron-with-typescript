@@ -10,14 +10,120 @@
     <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-    <section class="section">
+    <section class="hero is-primary is-medium" id="nav-section">
+        <div class="hero-head">
+            <header class="nav">
+                <div class="container">
+                    <div class="nav-left">
+                        <a class="nav-item is-active">
+                            Electron with TypeScript Hands-On Labs
+                        </a>
+                    </div>
+                    <span class="nav-toggle">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                    <div class="nav-right nav-menu">
+                        <a class="nav-item is-active">
+                            #general
+                        </a>
+                        <span class="nav-item" id="btn-logout">
+                            <a class="button is-primary is-inverted">
+                                <span class="icon">
+                                    <i class="fa fa-sign-out"></i>
+                                </span>
+                                <span>Logout</span>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </header>
+        </div>
+    </section>
+    <section class="section" id="login-section">
         <div class="container">
-            <h1 class="title">
-                Renderer Process
-            </h1>
-            <p class="subtitle">
-                My first website with <strong>Bulma</strong>!
-            </p>
+            <div class="field">
+                <p class="control has-icons-left has-icons-right">
+                    <input class="input" type="email" id="email" placeholder="Email">
+                    <span class="icon is-small is-left">
+                        <i class="fa fa-envelope"></i>
+                    </span>
+                    <span class="icon is-small is-right">
+                        <i class="fa fa-check"></i>
+                    </span>
+                </p>
+            </div>
+            <div class="field">
+                <p class="control has-icons-left">
+                    <input class="input" type="password" id="password" placeholder="Password">
+                    <span class="icon is-small is-left">
+                        <i class="fa fa-lock"></i>
+                    </span>
+                </p>
+            </div>
+            <div class="field">
+                <p class="control">
+                    <button class="button is-success" id="btn-login">Login</button>
+                </p>
+            </div>
+        </div>
+    </section>
+    <section class="section hero is-primary" id="chat-section">
+        <div class="container" id="message-container">
+            <div class="box">
+                <article class="media">
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong>John Smith</strong> <small>@johnsmith</small> <small>31m</small>
+                                <br>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
+                            </p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            <div class="box">
+                <article class="media">
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong>John Smith</strong> <small>@johnsmith</small> <small>31m</small>
+                                <br>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
+                            </p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+            <div class="box">
+                <article class="media">
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong>John Smith</strong> <small>@johnsmith</small> <small>31m</small>
+                                <br>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
+                            </p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+    <section class="section" id="write-section">
+        <div class="container">
+            <div class="field">
+                <div class="control">
+                    <textarea class="textarea" placeholder="Explain how we can help you"></textarea>
+                </div>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <button class="button is-primary">Send message</button>
+                </div>
+            </div>
         </div>
     </section>
     <script>

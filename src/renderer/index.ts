@@ -57,6 +57,11 @@ function main() {
         chatSection.style.display = 'none';
         writeSection.style.display = 'none';
     });
+
+    ipcRenderer.on('general-message', (event, arg: string) => {
+        console.log('receive : general-message');
+        console.error(arg);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', main);

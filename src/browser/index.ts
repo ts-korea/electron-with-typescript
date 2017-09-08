@@ -53,7 +53,8 @@ app.on('ready', () => {
             const ref = database.ref();
             ref.child('general').on('value', snapshot => {
                 if (snapshot) {
-                    console.log(snapshot.val());
+                    const messageObject = snapshot.val();
+                    event.sender.send('general-message', messageObject);
                 }
             });
         }

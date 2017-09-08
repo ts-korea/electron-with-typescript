@@ -50,6 +50,12 @@ app.on('ready', () => {
         }
         if (user) {
             event.sender.send('login-success');
+            const ref = database.ref();
+            ref.child('general').on('value', snapshot => {
+                if (snapshot) {
+                    console.log(snapshot.val());
+                }
+            });
         }
     });
 

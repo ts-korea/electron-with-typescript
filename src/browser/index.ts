@@ -2,7 +2,7 @@ import {app, BrowserWindow, ipcMain} from 'electron';
 import * as firebase from 'firebase';
 import * as url from 'url';
 import * as path from 'path';
-import {LoginObj} from '../common/type';
+import {LoginObjectType, MessageObjectType} from '../common/type';
 
 // 둘 중 하나가 참이면 => protocol 뒤에 // 가 붙는다.
 // protocol begins with http, https, ftp, gopher, or file
@@ -35,7 +35,7 @@ app.on('ready', () => {
     });
     win.loadURL(html);
 
-    ipcMain.on('request-login', async (event, arg: LoginObj) => {
+    ipcMain.on('request-login', async (event, arg: LoginObjectType) => {
         let user = null;
         try {
             user = await auth.signInWithEmailAndPassword(arg.email, arg.password);
@@ -53,8 +53,18 @@ app.on('ready', () => {
             const ref = database.ref();
             ref.child('general').on('value', snapshot => {
                 if (snapshot) {
-                    const messageObject = snapshot.val();
-                    event.sender.send('general-message', messageObject);
+                    const data = snapshot.val();
+                    const messageObjects: MessageObjectType[] = Object.keys(data).map(id => {
+                        const messageObject: MessageObjectType = {
+                            id,
+                            email: data[id].email,
+                            name: data[id].name,
+                            message: data[id].message,
+                            time: data[id].time
+                        };
+                        return messageObject;
+                    });
+                    event.sender.send('general-message', messageObjects);
                 }
             });
         }

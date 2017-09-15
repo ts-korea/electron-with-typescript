@@ -1,5 +1,5 @@
 import {ipcRenderer} from 'electron';
-import {LoginObj} from '../common/type';
+import {LoginObjectType, MessageObjectType} from '../common/type';
 
 function main() {
     const btnLogin = document.querySelector('#btn-login') as HTMLButtonElement;
@@ -11,7 +11,7 @@ function main() {
         const input_email = document.querySelector('#email') as HTMLInputElement;
         const input_password = document.querySelector('#password') as HTMLInputElement;
 
-        const loginObj: LoginObj = {
+        const loginObj: LoginObjectType = {
             email: input_email.value,
             password: input_password.value
         };
@@ -58,9 +58,27 @@ function main() {
         writeSection.style.display = 'none';
     });
 
-    ipcRenderer.on('general-message', (event, arg: string) => {
+    ipcRenderer.on('general-message', (event, arg: MessageObjectType[]) => {
         console.log('receive : general-message');
-        console.error(arg);
+        const messagesHTML = arg.map(messageObject => {
+            return `
+<div class="box">
+    <article class="media">
+        <div class="media-content">
+            <div class="content">
+                <p>
+                    <strong>${messageObject.name}</strong> <small>${messageObject.email}</small> <small>${messageObject.time}</small>
+                    <br>
+                    ${messageObject.message}
+                </p>
+            </div>
+        </div>
+    </article>
+</div>
+            `;
+        }).join('');
+        const messageContainer = document.querySelector('#message-container') as HTMLDivElement;
+        messageContainer.innerHTML = messagesHTML;
     });
 
     const btnSendMessage = document.querySelector('#btn-send-message') as HTMLButtonElement;

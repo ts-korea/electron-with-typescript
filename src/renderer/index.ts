@@ -62,6 +62,14 @@ function main() {
         console.log('receive : general-message');
         console.error(arg);
     });
+
+    const btnSendMessage = document.querySelector('#btn-send-message') as HTMLButtonElement;
+
+    btnSendMessage.addEventListener('click', () => {
+        console.log('#btn-send-message click');
+
+        ipcRenderer.send('send-message');
+    });
 }
 
 document.addEventListener('DOMContentLoaded', main);

@@ -86,7 +86,15 @@ function main() {
     btnSendMessage.addEventListener('click', () => {
         console.log('#btn-send-message click');
 
-        ipcRenderer.send('send-message');
+        const messageDom = document.querySelector('#message') as HTMLTextAreaElement;
+        const message = messageDom.value;
+
+        if (message === '') {
+            return;
+        }
+
+        ipcRenderer.send('send-message', message);
+        messageDom.value = '';
     });
 }
 

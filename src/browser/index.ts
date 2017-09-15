@@ -82,14 +82,14 @@ app.on('ready', () => {
         }
     });
 
-    ipcMain.on('send-message', async event => {
+    ipcMain.on('send-message', async (event, message: string) => {
         if (auth.currentUser) {
             const ref = database.ref();
             ref.child('general').push().set({
-                email: '이메일 주소',
-                name: '이름',
-                message: '메세지',
-                time: '시간'
+                email: auth.currentUser.email,
+                name: '2woongjae',
+                message: message,
+                time: new Date().toISOString()
             });
         }
     });

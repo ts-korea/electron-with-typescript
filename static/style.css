@@ -24,3 +24,7 @@
     bottom: 0px;
     left: 0px;
 }
+
+#btn-toggle {
+    display: none;
+}

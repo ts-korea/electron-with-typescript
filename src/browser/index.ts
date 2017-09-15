@@ -27,7 +27,7 @@ app.on('ready', () => {
     const win = new BrowserWindow({
         width: 500,
         minWidth: 500,
-        maxWidth: 900,
+        maxWidth: 500,
         height: 700,
         minHeight: 700,
         maxHeight: 700,

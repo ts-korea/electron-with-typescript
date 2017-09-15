@@ -41,6 +41,8 @@ function main() {
         loginSection.style.display = 'none';
         chatSection.style.display = 'block';
         writeSection.style.display = 'block';
+
+        btnToggle.style.display = 'block';
     });
 
     ipcRenderer.on('login-error', (event, arg: string) => {
@@ -56,6 +58,10 @@ function main() {
         loginSection.style.display = 'block';
         chatSection.style.display = 'none';
         writeSection.style.display = 'none';
+
+        btnToggle.style.display = 'none';
+        btnToggle.classList.toggle('is-active');
+        navMenu.classList.toggle('is-active');
     });
 
     ipcRenderer.on('general-message', (event, arg: MessageObjectType[]) => {
@@ -95,6 +101,14 @@ function main() {
 
         ipcRenderer.send('send-message', message);
         messageDom.value = '';
+    });
+
+    const btnToggle = document.querySelector('#btn-toggle') as HTMLSpanElement;
+    const navMenu = document.querySelector(`#nav-menu`) as HTMLDivElement;
+
+    btnToggle.addEventListener('click', () => {
+        btnToggle.classList.toggle('is-active');
+        navMenu.classList.toggle('is-active');
     });
 }
 

@@ -1,5 +1,7 @@
-import {ipcRenderer} from 'electron';
+import {ipcRenderer, remote} from 'electron';
 import {LoginObjectType, MessageObjectType} from '../common/type';
+
+const {dialog} = remote;
 
 function main() {
     const btnLogin = document.querySelector('#btn-login') as HTMLButtonElement;
@@ -8,8 +10,27 @@ function main() {
     btnLogin.addEventListener('click', () => {
         console.log('#btn-login click');
 
-        const input_email = document.querySelector('#email') as HTMLInputElement;
-        const input_password = document.querySelector('#password') as HTMLInputElement;
+        if (input_email.value.length < 4 || !validateEmail(input_email.value)) {
+            const win = remote.getCurrentWindow();
+            dialog.showMessageBox(win, {
+                message: 'Login Failed',
+                detail: '메일 주소가 유효하지 않습니다.'
+            }, () => {
+                input_email.focus();
+            });
+            return;
+        }
+
+        if (input_password.value.length < 4) {
+            const win = remote.getCurrentWindow();
+            dialog.showMessageBox(win, {
+                message: 'Login Failed',
+                detail: '패스워드가 유효하지 않습니다.'
+            }, () => {
+                input_password.focus();
+            });
+            return;
+        }
 
         const loginObj: LoginObjectType = {
             email: input_email.value,
@@ -19,11 +40,11 @@ function main() {
         ipcRenderer.send('request-login', loginObj);
     });
 
+    const input_email = document.querySelector('#email') as HTMLInputElement;
+    const input_password = document.querySelector('#password') as HTMLInputElement;
+
     btnLogout.addEventListener('click', () => {
         console.log('#btn-logout click');
-
-        const input_email = document.querySelector('#email') as HTMLInputElement;
-        const input_password = document.querySelector('#password') as HTMLInputElement;
 
         input_email.value = '';
         input_password.value = '';
@@ -45,11 +66,28 @@ function main() {
         btnToggle.style.display = 'block';
     });
 
-    ipcRenderer.on('login-error', (event, arg: string) => {
+    ipcRenderer.on('login-error', (event, code: string) => {
         console.log('receive : login-error');
-
-        // arg 를 메세지로 dialog 띄우기
-        console.error(arg);
+        console.error(code);
+        if (code === 'auth/user-not-found') {
+            const win = remote.getCurrentWindow();
+            dialog.showMessageBox(win, {
+                message: 'Login Failed',
+                detail: '등록되지 않은 이메일 주소입니다.'
+            }, () => {
+                input_email.focus();
+            });
+            return;
+        } else if (code === 'auth/wrong-password') {
+            const win = remote.getCurrentWindow();
+            dialog.showMessageBox(win, {
+                message: 'Login Failed',
+                detail: '잘못된 비밀번호 입니다.'
+            }, () => {
+                input_password.focus();
+            });
+            return;
+        }
     });
 
     ipcRenderer.on('logout-success', (event, arg) => {
@@ -113,3 +151,8 @@ function main() {
 }
 
 document.addEventListener('DOMContentLoaded', main);
+
+function validateEmail(email) {
+    const re = /\S+@\S+\.\S\S+/;
+    return re.test(email);
+}

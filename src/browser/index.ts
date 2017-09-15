@@ -42,7 +42,7 @@ app.on('ready', () => {
         } catch (error) {
             if (isFirebaseError(error)) {
                 console.log(error);
-                event.sender.send('login-error', error.message);
+                event.sender.send('login-error', error.code);
                 return;
             } else {
                 throw error;

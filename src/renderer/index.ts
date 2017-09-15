@@ -126,11 +126,11 @@ function main() {
     });
 
     const btnSendMessage = document.querySelector('#btn-send-message') as HTMLButtonElement;
-
+    const messageDom = document.querySelector('#message') as HTMLTextAreaElement;
+    
     btnSendMessage.addEventListener('click', () => {
         console.log('#btn-send-message click');
 
-        const messageDom = document.querySelector('#message') as HTMLTextAreaElement;
         const message = messageDom.value;
 
         if (message === '') {
@@ -147,6 +147,20 @@ function main() {
     btnToggle.addEventListener('click', () => {
         btnToggle.classList.toggle('is-active');
         navMenu.classList.toggle('is-active');
+    });
+
+    messageDom.addEventListener('keypress', e => {
+        if (e.shiftKey && e.keyCode === 13) {
+            e.preventDefault();
+
+            const message = messageDom.value;
+            if (message === '') {
+                return;
+            }
+
+            ipcRenderer.send('send-message', message);
+            messageDom.value = '';
+        }
     });
 }
 

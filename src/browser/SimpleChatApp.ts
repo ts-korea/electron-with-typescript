@@ -69,7 +69,7 @@ export class SimpleChatApp {
             ref.child('general').on('value', snapshot => {
                 if (snapshot) {
                     const data = snapshot.val();
-                    const messageObjects: MessageObjectType[] = Object.keys(data).map(id => {
+                    const messageObjects: MessageObjectType[] = data ? Object.keys(data).map(id => {
                         const messageObject: MessageObjectType = {
                             id,
                             email: data[id].email,
@@ -78,7 +78,7 @@ export class SimpleChatApp {
                             time: data[id].time
                         };
                         return messageObject;
-                    });
+                    }) : [];
                     event.sender.send('general-message', messageObjects);
                 }
             });

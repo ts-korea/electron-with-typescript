@@ -3,6 +3,8 @@ import {LoginObjectType, MessageObjectType} from '../common/type';
 
 const {dialog} = remote;
 
+const TAG = '[SimpleChatView]';
+
 export class SimpleChatView {
     private _btnLogin;
     private _btnLogout;
@@ -29,130 +31,141 @@ export class SimpleChatView {
         this._btnSendMessage = document.querySelector('#btn-send-message') as HTMLButtonElement;
         this._messageDom = document.querySelector('#message') as HTMLTextAreaElement;
 
-        this._bindEvent();
+        this._bindDomEvent();
         this._bindIpc();
     }
 
-    private _bindEvent() {
-        this._btnLogin.addEventListener('click', () => {
-            console.log('#btn-login click');
+    private _bindDomEvent(): void {
+        this._btnLogin.addEventListener('click', this._btnLoginClicked);
+        this._btnLogout.addEventListener('click', this._btnLogoutClicked);
+        this._btnSendMessage.addEventListener('click', this._btnSendMessageClicked);
+        this._btnToggle.addEventListener('click', this._btnToggleClicked);
+        this._messageDom.addEventListener('keypress', this._messageDomKeypressed);
+    }
+    private _bindIpc(): void {
+        ipcRenderer.on('login-success', this._ipcLoginSuccess);
+        ipcRenderer.on('login-error', this._ipcLoginError);
+        ipcRenderer.on('logout-success', this._ipcLogoutSuccess);
+        ipcRenderer.on('general-message', this._ipcGeneralMessage);
+    }
 
+    /*
+    * DOM 에 바인딩 된 이벤트의 함수
+    */
+    private _btnLoginClicked = (): void => {
+        console.log(TAG, '_btnLoginClicked');
+        const win = remote.getCurrentWindow();
+        if (this._input_email.value.length < 4 || !validateEmail(this._input_email.value)) {
+            dialog.showMessageBox(win, {
+                message: 'Login Failed',
+                detail: '메일 주소가 유효하지 않습니다.'
+            }, () => {
+                this._input_email.focus();
+            });
+            return;
+        }
+        if (this._input_password.value.length < 4) {
+            dialog.showMessageBox(win, {
+                message: 'Login Failed',
+                detail: '패스워드가 유효하지 않습니다.'
+            }, () => {
+                this._input_password.focus();
+            });
+            return;
+        }
+        const loginObj: LoginObjectType = {
+            email: this._input_email.value,
+            password: this._input_password.value
+        };
+        ipcRenderer.send('request-login', loginObj);
+    }
+    private _btnLogoutClicked = (): void => {
+        console.log(TAG, '_btnLogoutClicked');
+        this._input_email.value = '';
+        this._input_password.value = '';
+        ipcRenderer.send('request-logout');
+    }
+    private _btnSendMessageClicked = (): void => {
+        console.log(TAG, '_btnSendMessageClicked');
+        this._writeMessage();
+    }
+    private _btnToggleClicked = (): void => {
+        console.log(TAG, '_btnToggleClicked');
+        this._btnToggle.classList.toggle('is-active');
+        this._navMenu.classList.toggle('is-active');
+    }
+    private _messageDomKeypressed = (event): void => {
+        console.log(TAG, '_messageDomKeypressed');
+        if (event.keyCode === 13 && !event.shiftKey) {
+            event.preventDefault();
+            this._writeMessage();
+        }
+    }
+
+    /*
+    * ipcRenderer 에 바인딩된 이벤트의 함수
+    */
+    private _ipcLoginSuccess = (event): void => {
+        console.log(TAG, '_ipcLoginSuccess');
+        this._loginSection.style.display = 'none';
+        this._chatSection.style.display = 'block';
+        this._writeSection.style.display = 'block';
+        this._btnToggle.style.display = 'block';
+    }
+    private _ipcLoginError = (event, arg: string): void => {
+        console.log(TAG, '_ipcLoginError');
+        if (arg === 'auth/user-not-found') {
             const win = remote.getCurrentWindow();
-
-            if (this._input_email.value.length < 4 || !validateEmail(this._input_email.value)) {
-                dialog.showMessageBox(win, {
-                    message: 'Login Failed',
-                    detail: '메일 주소가 유효하지 않습니다.'
-                }, () => {
-                    this._input_email.focus();
-                });
-                return;
-            }
-
-            if (this._input_password.value.length < 4) {
-                dialog.showMessageBox(win, {
-                    message: 'Login Failed',
-                    detail: '패스워드가 유효하지 않습니다.'
-                }, () => {
-                    this._input_password.focus();
-                });
-                return;
-            }
-            const loginObj: LoginObjectType = {
-                email: this._input_email.value,
-                password: this._input_password.value
-            };
-            ipcRenderer.send('request-login', loginObj);
-        });
-        this._btnLogout.addEventListener('click', () => {
-            console.log('#btn-logout click');
-            this._input_email.value = '';
-            this._input_password.value = '';
-            ipcRenderer.send('request-logout');
-        });
-        this._btnSendMessage.addEventListener('click', this._writeMessage);
-        this._btnToggle.addEventListener('click', () => {
-            this._btnToggle.classList.toggle('is-active');
-            this._navMenu.classList.toggle('is-active');
-        });
-        this._messageDom.addEventListener('keypress', event => {
-            if (event.keyCode === 13 && !event.shiftKey) {
-                event.preventDefault();
-                this._writeMessage();
-            }
-        });
+            dialog.showMessageBox(win, {
+                message: 'Login Failed',
+                detail: '등록되지 않은 이메일 주소입니다.'
+            }, () => {
+                this._input_email.focus();
+            });
+            return;
+        } else if (arg === 'auth/wrong-password') {
+            const win = remote.getCurrentWindow();
+            dialog.showMessageBox(win, {
+                message: 'Login Failed',
+                detail: '잘못된 비밀번호 입니다.'
+            }, () => {
+                this._input_password.focus();
+            });
+            return;
+        }
     }
-
-    private _bindIpc() {
-        ipcRenderer.on('logout-success', (event, arg) => {
-            console.log('receive : logout-success');
-            this._loginSection.style.display = 'block';
-            this._chatSection.style.display = 'none';
-            this._writeSection.style.display = 'none';
-            this._btnToggle.style.display = 'none';
-            this._btnToggle.classList.toggle('is-active');
-            this._navMenu.classList.toggle('is-active');
-        });
-
-        ipcRenderer.on('general-message', (event, arg: MessageObjectType[]) => {
-            console.log('receive : general-message');
-            const messagesHTML = arg.map(messageObject => {
-                return `
-        <div class="box">
-        <article class="media">
-            <div class="media-content">
-                <div class="content">
-                    <p>
-                        <strong>${messageObject.name}</strong> <small>${messageObject.email}</small> <small>${messageObject.time}</small>
-                        <br>
-                        ${messageObject.message}
-                    </p>
-                </div>
+    private _ipcLogoutSuccess = (event, arg): void => {
+        console.log(TAG, '_ipcLogoutSuccess');
+        this._loginSection.style.display = 'block';
+        this._chatSection.style.display = 'none';
+        this._writeSection.style.display = 'none';
+        this._btnToggle.style.display = 'none';
+        this._btnToggle.classList.toggle('is-active');
+        this._navMenu.classList.toggle('is-active');
+    }
+    private _ipcGeneralMessage = (event, arg: MessageObjectType[]): void => {
+        console.log(TAG, '_ipcGeneralMessage');
+        const messagesHTML = arg.map(messageObject => {
+            return `
+<div class="box">
+    <article class="media">
+        <div class="media-content">
+            <div class="content">
+                <p>
+                    <strong>${messageObject.name}</strong> <small>${messageObject.email}</small> <small>${messageObject.time}</small>
+                    <br>
+                    ${messageObject.message}
+                </p>
             </div>
-        </article>
         </div>
-                `;
-            }).join('');
-            const messageContainer = document.querySelector('#message-container') as HTMLDivElement;
-            messageContainer.innerHTML = messagesHTML;
-        });
-
-        ipcRenderer.on('login-success', (event, arg) => {
-            console.log('receive : login-success');
-
-            this._loginSection.style.display = 'none';
-            this._chatSection.style.display = 'block';
-            this._writeSection.style.display = 'block';
-
-            this._btnToggle.style.display = 'block';
-        });
-
-        ipcRenderer.on('login-error', (event, code: string) => {
-            console.log('receive : login-error');
-            console.error(code);
-            if (code === 'auth/user-not-found') {
-                const win = remote.getCurrentWindow();
-                dialog.showMessageBox(win, {
-                    message: 'Login Failed',
-                    detail: '등록되지 않은 이메일 주소입니다.'
-                }, () => {
-                    this._input_email.focus();
-                });
-                return;
-            } else if (code === 'auth/wrong-password') {
-                const win = remote.getCurrentWindow();
-                dialog.showMessageBox(win, {
-                    message: 'Login Failed',
-                    detail: '잘못된 비밀번호 입니다.'
-                }, () => {
-                    this._input_password.focus();
-                });
-                return;
-            }
-        });
+    </article>
+</div>
+            `;
+        }).join('');
+        const messageContainer = document.querySelector('#message-container') as HTMLDivElement;
+        messageContainer.innerHTML = messagesHTML;
     }
-    private _writeMessage = () => {
-        console.log('#btn-send-message click');
+    private _writeMessage = (): void => {
         const message = this._messageDom.value;
         if (message === '') {
             return;
@@ -162,7 +175,7 @@ export class SimpleChatView {
     }
 }
 
-function validateEmail(email) {
+function validateEmail(email: string): boolean {
     const re = /\S+@\S+\.\S\S+/;
     return re.test(email);
 }

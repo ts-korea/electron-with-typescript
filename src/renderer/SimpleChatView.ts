@@ -155,6 +155,7 @@ export class SimpleChatView {
         }).join('');
         const messageContainer = document.querySelector('#message-container') as HTMLDivElement;
         messageContainer.innerHTML = messagesHTML;
+        document.getElementById('chat-section').scrollTop = messageContainer.scrollHeight;
     }
     private _writeMessage = (): void => {
         const message = this._messageDom.value;

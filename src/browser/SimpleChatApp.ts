@@ -1,4 +1,4 @@
-import {app, BrowserWindow, ipcMain} from 'electron';
+import {app, BrowserWindow, ipcMain, Tray, Menu} from 'electron';
 import * as firebase from 'firebase';
 import * as url from 'url';
 import * as path from 'path';
@@ -9,9 +9,12 @@ const HTML = url.format({
     protocol: 'file',
     pathname: path.join(__dirname, '../../static/index.html')
 });
+const TRAY_ICON_PATH = path.join(__dirname, '../../static/tray.png');
 
 export class SimpleChatApp {
     private _app;
+    private _tray = null;
+    private _win = null;
     private _auth;
     private _database;
 
@@ -26,24 +29,42 @@ export class SimpleChatApp {
         this._database = firebase.database();
         this._app = app;
         this._app.on('ready', this._ready);
+        this._app.on('quit', this._quit);
     }
 
     private _ready = (): void => {
         console.log(TAG, '_ready');
-        const win = new BrowserWindow({
+        this._tray = new Tray(TRAY_ICON_PATH);
+        this._tray.setContextMenu(this._getTrayMenu());
+        this._win = new BrowserWindow({
             width: 500,
             minWidth: 500,
             maxWidth: 500,
             height: 700,
             minHeight: 700,
             maxHeight: 700,
-            maximizable: false
+            maximizable: false,
+            show: false
         });
-        win.loadURL(HTML);
+        this._win.loadURL(HTML);
+        this._win.once('ready-to-show', () => {
+            this._win.show();
+        });
+        this._win.on('close', (event) => {
+            this._win.hide();
+            event.preventDefault();
+        });
 
         ipcMain.on('request-login', this._ipcRequestLogin);
         ipcMain.on('request-logout', this._ipcRequestLogout);
         ipcMain.on('send-message', this._ipcSendMessage);
+    }
+
+    private _quit = () => {
+        console.log(TAG, '_quit');
+        if (this._tray) {
+            this._tray.destory();
+        }
     }
 
     /*
@@ -107,6 +128,28 @@ export class SimpleChatApp {
                 time: new Date().toISOString()
             });
         }
+    }
+
+    private _getTrayMenu(): Electron.Menu {
+        return Menu.buildFromTemplate([
+            {
+                label: 'Open',
+                click: () => {
+                    if (this._win) {
+                        this._win.show();
+                    }
+                }
+            },
+            {
+                type: 'separator'
+            },
+            {
+                label: 'Exit',
+                click: () => {
+                    this._app.exit();
+                }
+            }
+        ]);
     }
 }
 

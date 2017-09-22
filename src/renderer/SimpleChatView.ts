@@ -105,7 +105,7 @@ export class SimpleChatView {
     /*
     * ipcRenderer 에 바인딩된 이벤트의 함수
     */
-    private _ipcLoginSuccess = (event): void => {
+    private _ipcLoginSuccess = (): void => {
         console.log(TAG, '_ipcLoginSuccess');
         this._loginSection.style.display = 'none';
         this._chatSection.style.display = 'block';

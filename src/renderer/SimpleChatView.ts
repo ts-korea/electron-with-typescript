@@ -41,6 +41,8 @@ export class SimpleChatView {
         this._btnSendMessage.addEventListener('click', this._btnSendMessageClicked);
         this._btnToggle.addEventListener('click', this._btnToggleClicked);
         this._messageDom.addEventListener('keypress', this._messageDomKeypressed);
+        this._input_email.addEventListener('keypress', this._inputEmailKeypressed);
+        this._input_password.addEventListener('keypress', this._inputPasswordKeypressed);
     }
     private _bindIpc(): void {
         ipcRenderer.on('login-success', this._ipcLoginSuccess);
@@ -54,30 +56,7 @@ export class SimpleChatView {
     */
     private _btnLoginClicked = (): void => {
         console.log(TAG, '_btnLoginClicked');
-        const win = remote.getCurrentWindow();
-        if (this._input_email.value.length < 4 || !validateEmail(this._input_email.value)) {
-            dialog.showMessageBox(win, {
-                message: 'Login Failed',
-                detail: '메일 주소가 유효하지 않습니다.'
-            }, () => {
-                this._input_email.focus();
-            });
-            return;
-        }
-        if (this._input_password.value.length < 4) {
-            dialog.showMessageBox(win, {
-                message: 'Login Failed',
-                detail: '패스워드가 유효하지 않습니다.'
-            }, () => {
-                this._input_password.focus();
-            });
-            return;
-        }
-        const loginObj: LoginObjectType = {
-            email: this._input_email.value,
-            password: this._input_password.value
-        };
-        ipcRenderer.send('request-login', loginObj);
+        this._requestLogin();
     }
     private _btnLogoutClicked = (): void => {
         console.log(TAG, '_btnLogoutClicked');
@@ -99,6 +78,18 @@ export class SimpleChatView {
         if (event.keyCode === 13 && !event.shiftKey) {
             event.preventDefault();
             this._writeMessage();
+        }
+    }
+    private _inputEmailKeypressed = (event): void => {
+        console.log(TAG, '_inputEmailKeypressed');
+        if (event.keyCode === 13) {
+            this._input_password.focus();
+        }
+    }
+    private _inputPasswordKeypressed = (event): void => {
+        console.log(TAG, '_inputPasswordKeypressed');
+        if (event.keyCode === 13) {
+            this._requestLogin();
         }
     }
 
@@ -172,6 +163,32 @@ export class SimpleChatView {
         }
         ipcRenderer.send('send-message', message);
         this._messageDom.value = '';
+    }
+    private _requestLogin = (): void => {
+        const win = remote.getCurrentWindow();
+        if (this._input_email.value.length < 4 || !validateEmail(this._input_email.value)) {
+            dialog.showMessageBox(win, {
+                message: 'Login Failed',
+                detail: '메일 주소가 유효하지 않습니다.'
+            }, () => {
+                this._input_email.focus();
+            });
+            return;
+        }
+        if (this._input_password.value.length < 4) {
+            dialog.showMessageBox(win, {
+                message: 'Login Failed',
+                detail: '패스워드가 유효하지 않습니다.'
+            }, () => {
+                this._input_password.focus();
+            });
+            return;
+        }
+        const loginObj: LoginObjectType = {
+            email: this._input_email.value,
+            password: this._input_password.value
+        };
+        ipcRenderer.send('request-login', loginObj);
     }
 }
 

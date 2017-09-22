@@ -36,6 +36,7 @@ export class SimpleChatApp {
         console.log(TAG, '_ready');
         this._tray = new Tray(TRAY_ICON_PATH);
         this._tray.setContextMenu(this._getTrayMenu());
+        Menu.setApplicationMenu(this._getApplicationMenu());
         this._win = new BrowserWindow({
             width: 500,
             minWidth: 500,
@@ -148,6 +149,45 @@ export class SimpleChatApp {
                 click: () => {
                     this._app.exit();
                 }
+            }
+        ]);
+    }
+
+    private _getApplicationMenu(): Electron.Menu {
+        return Menu.buildFromTemplate([
+            {
+                label: 'SimpleChat',
+                submenu: [
+                    {
+                        label: 'Open',
+                        click: () => {
+                            this._win.show();
+                        }
+                    },
+                    {
+                        type: 'separator'
+                    },
+                    {
+                        label: 'Quit',
+                        click: () => {
+                            this._app.exit();
+                        }
+                    }
+                ]
+            },
+            {
+                label: 'Edit',
+                submenu: [
+                    {role: 'undo'},
+                    {role: 'redo'},
+                    {type: 'separator'},
+                    {role: 'cut'},
+                    {role: 'copy'},
+                    {role: 'paste'},
+                    {role: 'pasteandmatchstyle'},
+                    {role: 'delete'},
+                    {role: 'selectall'}
+                ]
             }
         ]);
     }
